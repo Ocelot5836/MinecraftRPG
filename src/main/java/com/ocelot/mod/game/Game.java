@@ -5,6 +5,9 @@ import javax.annotation.Nullable;
 import com.mrcrayfish.device.core.Laptop;
 import com.ocelot.mod.MinecraftRPG;
 import com.ocelot.mod.app.ApplicationRPG;
+import com.ocelot.mod.game.core.TileMap;
+import com.ocelot.mod.game.core.gfx.TileRenderer;
+import com.ocelot.mod.game.core.tile.Tile;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -25,6 +28,9 @@ public class Game {
 
 	private ApplicationRPG app;
 
+	/** temporary code */
+	private TileMap tileMap;
+
 	public Game() {
 		instance = this;
 	}
@@ -36,6 +42,9 @@ public class Game {
 	 *             just in case something goes wrong so the game can handle it
 	 */
 	private void init() throws Throwable {
+		this.tileMap = new TileMap(8, 8, 2);
+		this.tileMap.setTile(Tile.ENCHANTMENT_TABLE, 0, 0, 1);
+		this.tileMap.setTile(Tile.ENCHANTMENT_TABLE, 7, 7, 1);
 	}
 
 	/**
@@ -59,6 +68,7 @@ public class Game {
 	 * Called 20 times per second from the gui that is hosting this game
 	 */
 	public void update() {
+		this.tileMap.update();
 	}
 
 	/**
@@ -76,6 +86,7 @@ public class Game {
 	 *            The percentage from last update and this update
 	 */
 	public void render(Gui gui, Minecraft mc, float mouseX, float mouseY, float partialTicks) {
+		this.tileMap.render(gui, mc, this, partialTicks);
 	}
 
 	/**
@@ -83,10 +94,10 @@ public class Game {
 	 */
 	public void dispose() {
 		MinecraftRPG.logger().info("Stopping...");
+		TileRenderer.dispose();
+		instance = null;
 
 		this.app = null;
-
-		instance = null;
 	}
 
 	/**

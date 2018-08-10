@@ -2,7 +2,9 @@ package com.ocelot.mod;
 
 import org.apache.logging.log4j.Logger;
 
+import com.mrcrayfish.device.Reference;
 import com.mrcrayfish.device.api.ApplicationManager;
+import com.mrcrayfish.device.programs.ApplicationBoatRacers;
 import com.ocelot.mod.app.ApplicationRPG;
 
 import net.minecraft.launchwrapper.Launch;
@@ -31,7 +33,7 @@ public class MinecraftRPG {
 	public static final String MOD_ID = "mrpg";
 	/** The current version of the mod */
 	public static final String VERSION = "0.0.1";
-	/** The id for the model creator app */
+	/** The id for the rpg app */
 	public static final ResourceLocation GAME_ID = new ResourceLocation(MOD_ID, "rpg");
 
 	/** The mod's instance. Probably not too useful but might as well have it */

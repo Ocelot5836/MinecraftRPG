@@ -46,7 +46,7 @@ public class ApplicationRPG extends Application {
 		{
 			GL11.glEnable(GL11.GL_SCISSOR_TEST);
 			GLHelper.pushScissor(x, y, this.getWidth(), this.getHeight());
-			GlStateManager.translate(x, y, 0);
+			GlStateManager.translate(x, y, 50);
 			this.game.render(laptop, mc, mouseX - x, mouseY - y, partialTicks);
 			GLHelper.popScissor();
 		}
