@@ -21,7 +21,8 @@ public class PropertyEnum<T extends Enum<T> & IStringSerializable> extends Prope
 	private final ImmutableSet<T> allowedValues;
 	private final Map<String, T> nameToValue = Maps.<String, T>newHashMap();
 
-	protected PropertyEnum(String name, Class<T> valueClass, Collection<T> allowedValues) {
+	protected PropertyEnum(String name, T defaultValue, Class<T> valueClass, Collection<T> allowedValues) {
+		super(defaultValue);
 		this.name = name;
 		this.valueClass = valueClass;
 		this.allowedValues = ImmutableSet.copyOf(allowedValues);
@@ -68,25 +69,25 @@ public class PropertyEnum<T extends Enum<T> & IStringSerializable> extends Prope
 		return i;
 	}
 
-	public static <T extends Enum<T> & IStringSerializable> PropertyEnum<T> create(String name, Class<T> clazz) {
-		return create(name, clazz, Predicates.alwaysTrue());
+	public static <T extends Enum<T> & IStringSerializable> PropertyEnum<T> create(String name, T defaultValue, Class<T> clazz) {
+		return create(name, defaultValue, clazz, Predicates.alwaysTrue());
 	}
 
-	public static <T extends Enum<T> & IStringSerializable> PropertyEnum<T> create(String name, Class<T> clazz, Predicate<T> filter) {
-		return create(name, clazz, Collections2.filter(Lists.newArrayList(clazz.getEnumConstants()), filter));
+	public static <T extends Enum<T> & IStringSerializable> PropertyEnum<T> create(String name, T defaultValue, Class<T> clazz, Predicate<T> filter) {
+		return create(name, defaultValue, clazz, Collections2.filter(Lists.newArrayList(clazz.getEnumConstants()), filter));
 	}
 
-	public static <T extends Enum<T> & IStringSerializable> PropertyEnum<T> create(String name, Class<T> clazz, T... values) {
-		return create(name, clazz, Lists.newArrayList(values));
+	public static <T extends Enum<T> & IStringSerializable> PropertyEnum<T> create(String name, T defaultValue, Class<T> clazz, T... values) {
+		return create(name, defaultValue, clazz, Lists.newArrayList(values));
 	}
 
-	public static <T extends Enum<T> & IStringSerializable> PropertyEnum<T> create(String name, Class<T> clazz, Collection<T> values) {
-		return new PropertyEnum<T>(name, clazz, values);
+	public static <T extends Enum<T> & IStringSerializable> PropertyEnum<T> create(String name, T defaultValue, Class<T> clazz, Collection<T> values) {
+		return new PropertyEnum<T>(name, defaultValue, clazz, values);
 	}
 
 	@Override
 	public IProperty<T> copy() {
-		IProperty<T> property = new PropertyEnum(this.name, this.valueClass, this.allowedValues);
+		IProperty<T> property = new PropertyEnum(this.name, this.getDefaultValue(), this.valueClass, this.allowedValues);
 		property.setValue(this.getValue());
 		return property;
 	}

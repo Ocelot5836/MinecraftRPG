@@ -33,10 +33,6 @@ public class BasicTile extends Tile {
 	}
 
 	@Override
-	public void update() {
-	}
-
-	@Override
 	public void render(Gui gui, Minecraft mc, Game game, TileMap tileMap, int x, int y, int layer, double renderX, double renderY, float partialTicks) {
 		TileRenderer.render(x - 8, y - 4, 16, 16, this.sprite);
 	}

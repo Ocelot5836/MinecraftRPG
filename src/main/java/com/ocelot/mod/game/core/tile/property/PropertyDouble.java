@@ -9,10 +9,10 @@ public class PropertyDouble extends PropertyBase<Double> {
 	private double maxValue;
 
 	private PropertyDouble(String name, double minValue, double maxValue) {
+		super(minValue);
 		this.name = name;
 		this.minValue = minValue;
 		this.maxValue = maxValue;
-		this.value = 0.0;
 	}
 
 	@Override

@@ -1,5 +1,7 @@
 package com.ocelot.mod.game.core;
 
+import java.io.BufferedReader;
+import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,10 +12,12 @@ import com.ocelot.mod.game.core.tile.Tile;
 import com.ocelot.mod.game.core.tile.property.IProperty;
 import com.ocelot.mod.game.core.tile.property.TileStateContainer;
 import com.ocelot.mod.game.core.tile.tileentity.TileEntity;
+import com.ocelot.mod.lib.Lib;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.ResourceLocation;
 
 /**
  * <em><b>Copyright (c) 2018 Ocelot5836.</b></em>
@@ -40,6 +44,11 @@ public class TileMap {
 	private double lastXOffset;
 	private double lastYOffset;
 
+	private TileMap() {
+		this.xOffset = 0;
+		this.yOffset = 0;
+	}
+
 	/**
 	 * @param width
 	 *            The width of the map
@@ -60,9 +69,57 @@ public class TileMap {
 		for (int layer = 0; layer < this.layers; layer++) {
 			for (int y = 0; y < this.height; y++) {
 				for (int x = 0; x < this.width; x++) {
-					this.setTile(layer == 0 ? Tile.DIRT : Tile.AIR, x, y, layer);
+					this.setTile(layer == 0 ? Tile.STONE : Tile.AIR, x, y, layer);
 				}
 			}
+		}
+	}
+
+	/**
+	 * @param mapLocation
+	 *            The location of the map to load
+	 */
+	public TileMap(ResourceLocation mapLocation) {
+		String data = Lib.loadTextToString(mapLocation);
+		if (data == null)
+			throw new RuntimeException("Could not find map \'" + mapLocation + "\'");
+
+		String line = null;
+		try {
+			BufferedReader reader = new BufferedReader(new StringReader(data));
+
+			int width = -1;
+			int height = -1;
+			int layers = -1;
+			int layer = -1;
+
+			while ((line = reader.readLine()) != null) {
+//				if (line.trim().isEmpty() || line.trim().startsWith("#"))
+//					continue;
+//				if (width == -1) {
+//					width = Integer.parseInt(line);
+//				} else if (height == -1) {
+//					height = Integer.parseInt(line);
+//				} else if (layers == -1) {
+//					layers = Integer.parseInt(line);
+//				} else {
+//					if (line.startsWith("layer:")) {
+//						if (width == -1 || height == -1 || layers == -1) {
+//							throw new IllegalArgumentException("Width, Height, and Layers can not be null!");
+//						}
+//						layer = Integer.parseInt(line.split(":")[1].trim());
+//					} else {
+//						if (layer == -1) {
+//							continue;
+//						}
+//						
+//						
+//					}
+//				}
+			}
+			reader.close();
+		} catch (Exception e) {
+			Game.getGame().handleCrash(e, "Error loading map \'" + mapLocation + "\' for line \'" + line + "\'");
 		}
 	}
 
@@ -71,12 +128,25 @@ public class TileMap {
 	 */
 	public void update() {
 		Tile.updateTiles();
+
+		for (int y = 0; y < this.height; y++) {
+			for (int x = 0; x < this.width; x++) {
+				for (int layer = 0; layer < this.layers; layer++) {
+					Tile tile = this.getTile(x, y, layer);
+					if (tile != null) {
+						tile.updateTile(this, x, y, layer);
+					}
+				}
+			}
+		}
+
 		for (String position : this.tileEntities.keySet()) {
 			TileEntity te = this.tileEntities.get(position);
 			if (te instanceof ITickable) {
 				((ITickable) te).update();
 			}
 		}
+
 		this.lastXOffset = this.xOffset;
 		this.lastYOffset = this.yOffset;
 	}
@@ -167,11 +237,11 @@ public class TileMap {
 	 *            The layer to get the tile at
 	 * @return The tile container at that position or null if there is no tile there
 	 */
-	@Nullable
 	public TileStateContainer getContainer(int x, int y, int layer) {
 		if (x < 0 || x >= this.width || y < 0 || y >= this.height || layer < 0 || layer >= this.layers)
-			return null;
-		return this.containers[x + y * this.width + layer * this.width * this.height];
+			return TileStateContainer.NULL;
+		TileStateContainer container = this.containers[x + y * this.width + layer * this.width * this.height];
+		return container == null ? TileStateContainer.NULL : container;
 	}
 
 	/**
@@ -187,12 +257,11 @@ public class TileMap {
 	 *            The layer to get the tile at
 	 * @return The tile container at that position or null if there is no tile there
 	 */
-	@Nullable
 	public <T> T getValue(IProperty<T> property, int x, int y, int layer) {
 		if (x < 0 || x >= this.width || y < 0 || y >= this.height || layer < 0 || layer >= this.layers)
-			return null;
+			return property.getDefaultValue();
 		TileStateContainer container = this.getContainer(x, y, layer);
-		return container == null ? null : container.getValue(property);
+		return container == TileStateContainer.NULL ? property.getDefaultValue() : container.getValue(property);
 	}
 
 	/**
@@ -211,6 +280,27 @@ public class TileMap {
 		if (x < 0 || x >= this.width || y < 0 || y >= this.height || layer < 0 || layer >= this.layers)
 			return null;
 		return this.tileEntities.get(x + "," + y + "," + layer);
+	}
+
+	/**
+	 * @return The width of the tile map
+	 */
+	public int getWidth() {
+		return width;
+	}
+
+	/**
+	 * @return The height of the tile map
+	 */
+	public int getHeight() {
+		return height;
+	}
+
+	/**
+	 * @return The amount of layers in the tile map
+	 */
+	public int getLayers() {
+		return layers;
 	}
 
 	/**
@@ -253,9 +343,9 @@ public class TileMap {
 	 * @param layer
 	 *            The layer of the tile
 	 */
-	public void setTile(Tile tile, int x, int y, int layer) {
-		if (x < 0 || x >= this.width || y < 0 || y >= this.height || layer < 0 || layer >= this.layers)
-			return;
+	public TileStateContainer setTile(Tile tile, int x, int y, int layer) {
+		if (x < 0 || x >= this.width || y < 0 || y >= this.height || layer < 0 || layer >= this.layers || layer == 0 && (!tile.isFullCube(this, x, y, layer) || tile.isTranslucent(this, x, y, layer)))
+			return TileStateContainer.NULL;
 		this.tiles[x + y * this.width + layer * this.width * this.height] = tile.getId();
 		this.containers[x + y * this.width + layer * this.width * this.height] = tile.createContainer();
 
@@ -263,6 +353,7 @@ public class TileMap {
 		if (te != null) {
 			this.tileEntities.put(x + "," + y + "," + layer, te);
 		}
+		return this.getContainer(x, y, layer);
 	}
 
 	/**
@@ -271,7 +362,7 @@ public class TileMap {
 	 * @param property
 	 *            The property to set the value of
 	 * @param value
-	 *            The new value of the property
+	 *            The new value of the property or null to reset to the default
 	 * @param x
 	 *            The x position of the tile
 	 * @param y
@@ -279,10 +370,10 @@ public class TileMap {
 	 * @param layer
 	 *            The layer of the tile
 	 */
-	public <T> void setValue(IProperty<T> property, T value, int x, int y, int layer) {
+	public <T> void setValue(IProperty<T> property, @Nullable T value, int x, int y, int layer) {
 		TileStateContainer container = this.getContainer(x, y, layer);
-		if (container != null) {
-			container.setValue(property, value);
+		if (container != TileStateContainer.NULL) {
+			container.setValue(property, value == null ? property.getDefaultValue() : value);
 		}
 	}
 }

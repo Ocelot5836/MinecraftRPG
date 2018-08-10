@@ -12,6 +12,8 @@ import com.ocelot.mod.game.Game;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.relauncher.Side;
 
 public class ApplicationRPG extends Application {
 
@@ -24,6 +26,9 @@ public class ApplicationRPG extends Application {
 	public void init(@Nullable NBTTagCompound intent) {
 		new Game().launch(this);
 		this.game = Game.getGame();
+		
+		this.setDefaultWidth(362);
+		this.setDefaultHeight(164);
 	}
 
 	@Override

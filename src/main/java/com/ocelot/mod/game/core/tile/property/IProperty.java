@@ -16,9 +16,14 @@ package com.ocelot.mod.game.core.tile.property;
 public interface IProperty<T> {
 
 	/**
-	 * @return The property's value.
+	 * @return The property's value
 	 */
 	T getValue();
+
+	/**
+	 * @return The default property's value
+	 */
+	T getDefaultValue();
 
 	/**
 	 * Sets the property value to the one specified.

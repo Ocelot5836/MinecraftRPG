@@ -16,11 +16,24 @@ package com.ocelot.mod.game.core.tile.property;
 public abstract class PropertyBase<T> implements IProperty<T> {
 
 	/** The value being stored. */
-	protected T value;
+	private T value;
+	
+	/** The default value being stored. */
+	private final T defaultValue;
+	
+	public PropertyBase(T defaultValue) {
+		this.value = defaultValue;
+		this.defaultValue = defaultValue;
+	}
 
 	@Override
 	public T getValue() {
 		return value;
+	}
+	
+	@Override
+	public T getDefaultValue() {
+		return defaultValue;
 	}
 
 	@Override

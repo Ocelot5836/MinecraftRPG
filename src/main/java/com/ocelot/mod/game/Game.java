@@ -2,17 +2,21 @@ package com.ocelot.mod.game;
 
 import javax.annotation.Nullable;
 
+import org.lwjgl.input.Keyboard;
+
 import com.mrcrayfish.device.core.Laptop;
 import com.ocelot.mod.MinecraftRPG;
 import com.ocelot.mod.app.ApplicationRPG;
 import com.ocelot.mod.game.core.TileMap;
 import com.ocelot.mod.game.core.gfx.TileRenderer;
 import com.ocelot.mod.game.core.tile.Tile;
-import com.ocelot.mod.game.core.tile.tiles.TileWool;
+import com.ocelot.mod.game.core.tile.tiles.TileSand;
+import com.ocelot.mod.game.core.tile.tiles.TileSapling;
 
+import net.minecraft.block.BlockPlanks;
+import net.minecraft.block.BlockSand;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.item.EnumDyeColor;
 
 /**
  * <em><b>Copyright (c) 2018 Ocelot5836.</b></em>
@@ -44,12 +48,16 @@ public class Game {
 	 *             just in case something goes wrong so the game can handle it
 	 */
 	private void init() throws Throwable {
-		this.tileMap = new TileMap(32, 32, 2);
+		this.tileMap = new TileMap(32, 32, 20);
 
-		for (int i = 0; i < EnumDyeColor.values().length; i++) {
-			this.tileMap.setTile(Tile.WOOL, i % 4, 2 + i / 4, 0);
-			this.tileMap.setValue(TileWool.COLOR, EnumDyeColor.values()[i], i % 4, 2 + i / 4, 0);
+		for (int y = 0; y < 6; y++) {
+			for (int x = 0; x < 6; x++) {
+				this.tileMap.setTile(Tile.GRASS, 2 + x, 2 + y, 0);
+				this.tileMap.setTile(Tile.SAPLING, 2 + x, 2 + y, 1).setValue(TileSapling.TYPE, BlockPlanks.EnumType.values()[x]);
+			}
 		}
+		this.tileMap.setTile(Tile.BEDROCK, 8, 8, 5);
+		this.tileMap.setTile(Tile.SAND, 9, 8, 5).setValue(TileSand.VARIANT, BlockSand.EnumType.RED_SAND);
 	}
 
 	/**
@@ -74,6 +82,22 @@ public class Game {
 	 */
 	public void update() {
 		this.tileMap.update();
+
+		if (Keyboard.isKeyDown(Keyboard.KEY_W)) {
+			this.tileMap.setOffset(this.tileMap.getXOffset(), this.tileMap.getYOffset() - 5);
+		}
+
+		if (Keyboard.isKeyDown(Keyboard.KEY_S)) {
+			this.tileMap.setOffset(this.tileMap.getXOffset(), this.tileMap.getYOffset() + 5);
+		}
+
+		if (Keyboard.isKeyDown(Keyboard.KEY_A)) {
+			this.tileMap.setOffset(this.tileMap.getXOffset() - 5, this.tileMap.getYOffset());
+		}
+
+		if (Keyboard.isKeyDown(Keyboard.KEY_D)) {
+			this.tileMap.setOffset(this.tileMap.getXOffset() + 5, this.tileMap.getYOffset());
+		}
 	}
 
 	/**

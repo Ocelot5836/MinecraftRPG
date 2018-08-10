@@ -8,14 +8,19 @@ import com.ocelot.mod.game.core.TileMap;
 import com.ocelot.mod.game.core.tile.property.TileStateContainer;
 import com.ocelot.mod.game.core.tile.tileentity.TileEntity;
 import com.ocelot.mod.game.core.tile.tiles.TileAir;
-import com.ocelot.mod.game.core.tile.tiles.TileEnchantmentTable;
-import com.ocelot.mod.game.core.tile.tiles.TileWool;
+import com.ocelot.mod.game.core.tile.tiles.TileDirt;
+import com.ocelot.mod.game.core.tile.tiles.TileFalling;
+import com.ocelot.mod.game.core.tile.tiles.TileGrass;
+import com.ocelot.mod.game.core.tile.tiles.TilePlanks;
+import com.ocelot.mod.game.core.tile.tiles.TileSand;
+import com.ocelot.mod.game.core.tile.tiles.TileSapling;
+import com.ocelot.mod.game.core.tile.tiles.TileStone;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.init.Blocks;
-import net.minecraft.item.ItemStack;
+import net.minecraft.util.ITickable;
 
 /**
  * <em><b>Copyright (c) 2018 Ocelot5836.</b></em>
@@ -36,14 +41,25 @@ public abstract class Tile {
 	private String registryName;
 	private String unlocalizedName;
 
-	public static final Tile VOID = new BasicTile(0, "void", "void", new ItemStack(Blocks.COAL_BLOCK));
-	public static final Tile AIR = new TileAir(1);
-	public static final Tile DIRT = new Basic3DTile(2, "dirt", "dirt", Blocks.DIRT.getDefaultState());
-	public static final Tile ANVIL = new Basic3DTile(3, "anvil", "anvil", Blocks.ANVIL.getDefaultState());
-	public static final Tile ENCHANTMENT_TABLE = new TileEnchantmentTable(4);
-	public static final Tile BEACON = new Basic3DTile(5, "beacon", "beacon", Blocks.BEACON.getDefaultState());
-	public static final Tile CARPET = new Basic3DTile(6, "carpet", "carpet", Blocks.CARPET.getDefaultState());
-	public static final Tile WOOL = new TileWool(7);
+	public static final Tile AIR = new TileAir(0);
+
+	public static final Tile STONE = new TileStone(1);
+	public static final Tile GRASS = new TileGrass(2);
+	public static final Tile DIRT = new TileDirt(3);
+	public static final Tile COBBLESTONE = new Basic3DTile(4, "cobblestone", "cobblestone", Blocks.COBBLESTONE.getDefaultState());
+	public static final Tile PLANKS = new TilePlanks(5);
+	public static final Tile SAPLING = new TileSapling(6);
+	public static final Tile BEDROCK = new Basic3DTile(7, "bedrock", "bedrock", Blocks.BEDROCK.getDefaultState());
+	// public static final Tile WATER = new TileFluid(8, "water", "water", Blocks.WATER.getDefaultState(), Blocks.FLOWING_WATER.getDefaultState());
+	// public static final Tile LAVA = new TileFluid(9, "lava", "lava", Blocks.LAVA.getDefaultState(), Blocks.FLOWING_LAVA.getDefaultState());
+	public static final Tile SAND = new TileSand(10);
+	public static final Tile GRAVEL = new TileFalling(11, "gravel", "gravel", Blocks.GRAVEL.getDefaultState());
+
+	// public static final Tile ANVIL = new Basic3DTile(3, "anvil", "anvil", Blocks.ANVIL.getDefaultState());
+	// public static final Tile ENCHANTMENT_TABLE = new TileEnchantmentTable(4);
+	// public static final Tile BEACON = new Basic3DTile(5, "beacon", "beacon", Blocks.BEACON.getDefaultState());
+	// public static final Tile CARPET = new Basic3DTile(6, "carpet", "carpet", Blocks.CARPET.getDefaultState());
+	// public static final Tile WOOL = new TileWool(7);
 
 	/**
 	 * @param id
@@ -66,9 +82,19 @@ public abstract class Tile {
 	}
 
 	/**
-	 * Updates the tile. Called 20 times per second.
+	 * Updates the tile at the specified tile position. Called 20 times per second.
+	 * 
+	 * @param tileMap
+	 *            The map this tile is being updated from
+	 * @param x
+	 *            The x position of this tile
+	 * @param y
+	 *            The y position of this tile
+	 * @param layer
+	 *            The layer of this tile
 	 */
-	public abstract void update();
+	public void updateTile(TileMap tileMap, int x, int y, int layer) {
+	}
 
 	/**
 	 * Called to render this tile to the screen.
@@ -100,7 +126,7 @@ public abstract class Tile {
 	 * Called to modify any properties in the tileStateContainer.
 	 * 
 	 * @param tileMap
-	 *            The tilemap instance
+	 *            The tile map instance
 	 * @param container
 	 *            The container that is being modified
 	 */
@@ -164,13 +190,47 @@ public abstract class Tile {
 	}
 
 	/**
-	 * Updates all the tiles.
+	 * Used to test if you can place this on layer zero.
+	 * 
+	 * @param tileMap
+	 *            The tile map instance
+	 * @param x
+	 *            The x position of the tile
+	 * @param y
+	 *            The y position of the tile
+	 * @param layer
+	 *            The layer of the tile
+	 * @return Whether or not this has the ability to be placed on layer zero
+	 */
+	public boolean isFullCube(TileMap tileMap, int x, int y, int layer) {
+		return true;
+	}
+
+	/**
+	 * Used to determine if light can pass through this cube.
+	 * 
+	 * @param tileMap
+	 *            The tile map instance
+	 * @param x
+	 *            The x position of the tile
+	 * @param y
+	 *            The y position of the tile
+	 * @param layer
+	 *            The layer of the tile
+	 * @return Whether or not this is a translucent cube
+	 */
+	public boolean isTranslucent(TileMap tileMap, int x, int y, int layer) {
+		return false;
+	}
+
+	/**
+	 * Updates all the tiles that implement {@link ITickable}.
 	 */
 	public static void updateTiles() {
 		for (int id = 0; id < TILES.length; id++) {
 			Tile tile = getTile(id);
-			if (tile != null) {
-				tile.update();
+			if (tile != null && tile instanceof ITickable) {
+				((ITickable) tile).update();
 			}
 		}
 	}

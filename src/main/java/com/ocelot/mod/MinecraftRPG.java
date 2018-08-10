@@ -51,6 +51,7 @@ public class MinecraftRPG {
 	@EventHandler
 	public void init(FMLInitializationEvent event) {
 		ApplicationManager.registerApplication(GAME_ID, ApplicationRPG.class);
+		ApplicationManager.registerApplication(new ResourceLocation(MOD_ID, "boat_racers"), ApplicationBoatRacers.class);
 	}
 
 	@EventHandler

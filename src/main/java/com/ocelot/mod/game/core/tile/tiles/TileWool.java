@@ -12,20 +12,20 @@ import net.minecraft.item.EnumDyeColor;
 
 public class TileWool extends Basic3DTile {
 
-	public static final PropertyEnum<EnumDyeColor> COLOR = PropertyEnum.create("color", EnumDyeColor.class);
+	public static final PropertyEnum<EnumDyeColor> COLOR = PropertyEnum.create("color", EnumDyeColor.WHITE, EnumDyeColor.class);
 
 	public TileWool(int id) {
 		super(id, "wool", "wool", null);
 	}
 
 	@Override
-	public IBlockState getState(TileMap tileMap, int x, int y, int layer) {
-		EnumDyeColor color = tileMap.getValue(COLOR, x, y, layer);
-		return color == null ? Blocks.WOOL.getDefaultState() : Blocks.WOOL.getDefaultState().withProperty(BlockColored.COLOR, color);
+	public TileStateContainer createContainer() {
+		return new TileStateContainer(this, COLOR);
 	}
 
 	@Override
-	public TileStateContainer createContainer() {
-		return new TileStateContainer(this, COLOR);
+	public IBlockState getState(TileMap tileMap, int x, int y, int layer) {
+		EnumDyeColor color = tileMap.getValue(COLOR, x, y, layer);
+		return Blocks.WOOL.getDefaultState().withProperty(BlockColored.COLOR, color);
 	}
 }

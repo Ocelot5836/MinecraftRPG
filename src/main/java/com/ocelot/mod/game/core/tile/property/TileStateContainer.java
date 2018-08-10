@@ -18,6 +18,8 @@ import com.ocelot.mod.game.core.tile.Tile;
  */
 public class TileStateContainer {
 
+	public static final TileStateContainer NULL = new TileStateContainer(null);
+
 	private Tile tile;
 	private Map<String, IProperty> properties = Maps.<String, IProperty>newHashMap();
 
@@ -53,9 +55,11 @@ public class TileStateContainer {
 	 *             If the property does not exist in the container
 	 */
 	public <T> T getValue(IProperty<T> property) {
+		if (this == NULL)
+			return property.getDefaultValue();
 		if (!properties.containsKey(property.getName()))
 			Game.getGame().handleCrash(new IllegalArgumentException("Property " + property.getName() + " attempted to be accessed even though it does not exist."), "You cannot get the value of a property that does not exist!");
-		return (T) properties.get(property.getName()) == null ? null : (T) properties.get(property.getName()).getValue();
+		return (T) properties.get(property.getName()) == null ? property.getDefaultValue() : (T) properties.get(property.getName()).getValue();
 	}
 
 	/**
@@ -69,6 +73,8 @@ public class TileStateContainer {
 	 *             If the property does not exist in the container
 	 */
 	public <T> TileStateContainer setValue(IProperty<T> property, T value) {
+		if (this == NULL)
+			return NULL;
 		if (!properties.containsKey(property.getName()))
 			Game.getGame().handleCrash(new IllegalArgumentException("Property " + property.getName() + " attempted to be set even though it does not exist."), "You cannot set the value of a property that does not exist!");
 		properties.get(property.getName()).setValue(value);

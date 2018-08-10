@@ -5,8 +5,8 @@ public class PropertyBoolean extends PropertyBase<Boolean> {
 	private String name;
 
 	private PropertyBoolean(String name) {
+		super(false);
 		this.name = name;
-		this.value = false;
 	}
 
 	@Override

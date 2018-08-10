@@ -14,10 +14,6 @@ public class TileAir extends Tile {
 	}
 
 	@Override
-	public void update() {
-	}
-
-	@Override
 	public void render(Gui gui, Minecraft mc, Game game, TileMap tileMap, int x, int y, int layer, double renderX, double renderY, float partialTicks) {
 	}
 }

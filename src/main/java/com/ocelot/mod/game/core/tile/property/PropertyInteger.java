@@ -9,15 +9,15 @@ public class PropertyInteger extends PropertyBase<Integer> {
 	private int maxValue;
 
 	private PropertyInteger(String name, int minValue, int maxValue) {
+		super(minValue);
 		this.name = name;
 		this.minValue = minValue;
 		this.maxValue = maxValue;
-		this.value = 0;
 	}
-	
+
 	@Override
 	public void setValue(Integer value) {
-		if(value < minValue || value > maxValue)
+		if (value < minValue || value > maxValue)
 			Game.getGame().handleCrash(new IllegalArgumentException("Property attempted to set integer value out of range. value: " + value + ", range: [" + this.minValue + "-" + this.maxValue + "]"), "A tile attempted to set an integer property out of range.");
 		super.setValue(value);
 	}
@@ -26,15 +26,15 @@ public class PropertyInteger extends PropertyBase<Integer> {
 	public String getName() {
 		return this.name;
 	}
-	
+
 	public static PropertyInteger create(String name, int minValue, int maxValue) {
 		return new PropertyInteger(name, minValue, maxValue);
 	}
-	
+
 	public int getMinValue() {
 		return minValue;
 	}
-	
+
 	public int getMaxValue() {
 		return maxValue;
 	}
