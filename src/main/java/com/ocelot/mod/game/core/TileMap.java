@@ -7,6 +7,8 @@ import javax.annotation.Nullable;
 
 import com.ocelot.mod.game.Game;
 import com.ocelot.mod.game.core.tile.Tile;
+import com.ocelot.mod.game.core.tile.property.IProperty;
+import com.ocelot.mod.game.core.tile.property.TileStateContainer;
 import com.ocelot.mod.game.core.tile.tileentity.TileEntity;
 
 import net.minecraft.client.Minecraft;
@@ -26,6 +28,7 @@ import net.minecraft.util.ITickable;
 public class TileMap {
 
 	private int[] tiles;
+	private TileStateContainer[] containers;
 	private Map<String, TileEntity> tileEntities;
 
 	private int width;
@@ -52,6 +55,7 @@ public class TileMap {
 		this.height = height;
 		this.layers = layers;
 		this.tiles = new int[width * height * layers];
+		this.containers = new TileStateContainer[this.tiles.length];
 		this.tileEntities = new HashMap<String, TileEntity>();
 		for (int layer = 0; layer < this.layers; layer++) {
 			for (int y = 0; y < this.height; y++) {
@@ -95,6 +99,10 @@ public class TileMap {
 				for (int x = 0; x < this.width; x++) {
 					Tile tile = this.getTile(x, y, layer);
 					if (tile != null) {
+						TileStateContainer container = this.getContainer(x, y, layer);
+						if (container != null) {
+							tile.modifyContainer(x, y, layer, this, container);
+						}
 						tile.render(gui, mc, game, this, x, y, layer, x * 16 - (this.lastXOffset + (this.xOffset - this.lastXOffset) * partialTicks), y * 16 - (this.lastYOffset + (this.yOffset - this.lastYOffset) * partialTicks) - 4.75 * y, partialTicks);
 					}
 				}
@@ -146,6 +154,45 @@ public class TileMap {
 		if (x < 0 || x >= this.width || y < 0 || y >= this.height || layer < 0 || layer >= this.layers)
 			return null;
 		return Tile.getTile(this.tiles[x + y * this.width + layer * this.width * this.height]);
+	}
+
+	/**
+	 * Checks the tiles at the specified position.
+	 * 
+	 * @param x
+	 *            The x position to get the tile at
+	 * @param y
+	 *            The y position to get the tile at
+	 * @param layer
+	 *            The layer to get the tile at
+	 * @return The tile container at that position or null if there is no tile there
+	 */
+	@Nullable
+	public TileStateContainer getContainer(int x, int y, int layer) {
+		if (x < 0 || x >= this.width || y < 0 || y >= this.height || layer < 0 || layer >= this.layers)
+			return null;
+		return this.containers[x + y * this.width + layer * this.width * this.height];
+	}
+
+	/**
+	 * Checks the tiles at the specified position.
+	 * 
+	 * @param property
+	 *            The property to get the value of
+	 * @param x
+	 *            The x position to get the tile at
+	 * @param y
+	 *            The y position to get the tile at
+	 * @param layer
+	 *            The layer to get the tile at
+	 * @return The tile container at that position or null if there is no tile there
+	 */
+	@Nullable
+	public <T> T getValue(IProperty<T> property, int x, int y, int layer) {
+		if (x < 0 || x >= this.width || y < 0 || y >= this.height || layer < 0 || layer >= this.layers)
+			return null;
+		TileStateContainer container = this.getContainer(x, y, layer);
+		return container == null ? null : container.getValue(property);
 	}
 
 	/**
@@ -210,10 +257,32 @@ public class TileMap {
 		if (x < 0 || x >= this.width || y < 0 || y >= this.height || layer < 0 || layer >= this.layers)
 			return;
 		this.tiles[x + y * this.width + layer * this.width * this.height] = tile.getId();
+		this.containers[x + y * this.width + layer * this.width * this.height] = tile.createContainer();
 
 		TileEntity te = tile.createNewTileEntity(this, x, y, layer);
 		if (te != null) {
 			this.tileEntities.put(x + "," + y + "," + layer, te);
+		}
+	}
+
+	/**
+	 * Sets the value of the container at the specified position.
+	 * 
+	 * @param property
+	 *            The property to set the value of
+	 * @param value
+	 *            The new value of the property
+	 * @param x
+	 *            The x position of the tile
+	 * @param y
+	 *            The y position of the tile
+	 * @param layer
+	 *            The layer of the tile
+	 */
+	public <T> void setValue(IProperty<T> property, T value, int x, int y, int layer) {
+		TileStateContainer container = this.getContainer(x, y, layer);
+		if (container != null) {
+			container.setValue(property, value);
 		}
 	}
 }

@@ -8,9 +8,11 @@ import com.ocelot.mod.app.ApplicationRPG;
 import com.ocelot.mod.game.core.TileMap;
 import com.ocelot.mod.game.core.gfx.TileRenderer;
 import com.ocelot.mod.game.core.tile.Tile;
+import com.ocelot.mod.game.core.tile.tiles.TileWool;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.item.EnumDyeColor;
 
 /**
  * <em><b>Copyright (c) 2018 Ocelot5836.</b></em>
@@ -42,9 +44,12 @@ public class Game {
 	 *             just in case something goes wrong so the game can handle it
 	 */
 	private void init() throws Throwable {
-		this.tileMap = new TileMap(8, 8, 2);
-		this.tileMap.setTile(Tile.ENCHANTMENT_TABLE, 0, 0, 1);
-		this.tileMap.setTile(Tile.ENCHANTMENT_TABLE, 7, 7, 1);
+		this.tileMap = new TileMap(32, 32, 2);
+
+		for (int i = 0; i < EnumDyeColor.values().length; i++) {
+			this.tileMap.setTile(Tile.WOOL, i % 4, 2 + i / 4, 0);
+			this.tileMap.setValue(TileWool.COLOR, EnumDyeColor.values()[i], i % 4, 2 + i / 4, 0);
+		}
 	}
 
 	/**
@@ -59,7 +64,7 @@ public class Game {
 		try {
 			this.init();
 		} catch (Throwable t) {
-			this.handleCrash(t);
+			this.handleCrash(t, "Error while initialization");
 		}
 		MinecraftRPG.logger().info("Starting...");
 	}
@@ -107,6 +112,18 @@ public class Game {
 	 *            The error that was thrown
 	 */
 	public void handleCrash(Throwable t) {
+		this.handleCrash(t, "No information provided");
+	}
+
+	/**
+	 * Called whenever the game wishes to crash.
+	 * 
+	 * @param t
+	 *            The error that was thrown
+	 * @param info
+	 *            The reason/information as to why the game crashed
+	 */
+	public void handleCrash(Throwable t, String info) {
 		MinecraftRPG.logger().catching(t);
 		Laptop.getSystem().closeApplication(this.app.getInfo());
 	}

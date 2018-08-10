@@ -5,9 +5,11 @@ import javax.annotation.Nullable;
 import com.ocelot.mod.MinecraftRPG;
 import com.ocelot.mod.game.Game;
 import com.ocelot.mod.game.core.TileMap;
+import com.ocelot.mod.game.core.tile.property.TileStateContainer;
 import com.ocelot.mod.game.core.tile.tileentity.TileEntity;
 import com.ocelot.mod.game.core.tile.tiles.TileAir;
 import com.ocelot.mod.game.core.tile.tiles.TileEnchantmentTable;
+import com.ocelot.mod.game.core.tile.tiles.TileWool;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -41,6 +43,7 @@ public abstract class Tile {
 	public static final Tile ENCHANTMENT_TABLE = new TileEnchantmentTable(4);
 	public static final Tile BEACON = new Basic3DTile(5, "beacon", "beacon", Blocks.BEACON.getDefaultState());
 	public static final Tile CARPET = new Basic3DTile(6, "carpet", "carpet", Blocks.CARPET.getDefaultState());
+	public static final Tile WOOL = new TileWool(7);
 
 	/**
 	 * @param id
@@ -94,6 +97,18 @@ public abstract class Tile {
 	public abstract void render(Gui gui, Minecraft mc, Game game, TileMap tileMap, int x, int y, int layer, double renderX, double renderY, float partialTicks);
 
 	/**
+	 * Called to modify any properties in the tileStateContainer.
+	 * 
+	 * @param tileMap
+	 *            The tilemap instance
+	 * @param container
+	 *            The container that is being modified
+	 */
+	public TileStateContainer modifyContainer(int x, int y, int layer, TileMap tileMap, TileStateContainer container) {
+		return container;
+	}
+
+	/**
 	 * Creates a new tile entity that will be bound to this position.
 	 * 
 	 * @param tileMap
@@ -109,6 +124,15 @@ public abstract class Tile {
 	@Nullable
 	public TileEntity createNewTileEntity(TileMap tileMap, int x, int y, int layer) {
 		return null;
+	}
+
+	/**
+	 * Creates a new {@link TileStateContainer}. If you have custom properties, you MUST override this method to register them!
+	 * 
+	 * @return The container created
+	 */
+	public TileStateContainer createContainer() {
+		return new TileStateContainer(this);
 	}
 
 	/**

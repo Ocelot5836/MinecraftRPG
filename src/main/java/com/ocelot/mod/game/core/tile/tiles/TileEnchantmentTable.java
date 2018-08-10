@@ -11,7 +11,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.model.ModelBook;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.ResourceLocation;
@@ -40,10 +39,10 @@ public class TileEnchantmentTable extends Basic3DTile {
 
 			GlStateManager.rotate(-45, 1, 0, 0);
 			GlStateManager.rotate(180, 1, 0, 0);
-			
-			GlStateManager.translate(0,4,0);
-			
-			GlStateManager.scale(20,20,20);
+
+			GlStateManager.translate(0, 5, 0);
+
+			GlStateManager.scale(20, 20, 20);
 
 			{
 				GlStateManager.pushMatrix();
