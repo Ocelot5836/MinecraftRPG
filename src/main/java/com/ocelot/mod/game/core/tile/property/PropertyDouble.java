@@ -27,8 +27,9 @@ public class PropertyDouble extends PropertyBase<Double> {
 		return this.name;
 	}
 
-	public static PropertyDouble create(String name, double minValue, double maxValue) {
-		return new PropertyDouble(name, minValue, maxValue);
+	@Override
+	public void parseValue(String value) throws Exception {
+		this.setValue(Double.parseDouble(value));
 	}
 
 	public double getMinValue() {
@@ -44,5 +45,9 @@ public class PropertyDouble extends PropertyBase<Double> {
 		IProperty<Double> property = new PropertyDouble(this.name, this.minValue, this.maxValue);
 		property.setValue(this.getValue());
 		return property;
+	}
+
+	public static PropertyDouble create(String name, double minValue, double maxValue) {
+		return new PropertyDouble(name, minValue, maxValue);
 	}
 }

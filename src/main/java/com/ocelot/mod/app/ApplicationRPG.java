@@ -8,25 +8,27 @@ import com.mrcrayfish.device.api.app.Application;
 import com.mrcrayfish.device.core.Laptop;
 import com.mrcrayfish.device.util.GLHelper;
 import com.ocelot.mod.game.Game;
+import com.ocelot.mod.game.core.TileMap;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.relauncher.Side;
 
 public class ApplicationRPG extends Application {
 
+	private static ApplicationRPG app;
+	
 	private Game game;
 
 	public ApplicationRPG() {
+		app = this;
 	}
 
 	@Override
 	public void init(@Nullable NBTTagCompound intent) {
 		new Game().launch(this);
 		this.game = Game.getGame();
-		
+
 		this.setDefaultWidth(362);
 		this.setDefaultHeight(164);
 	}
@@ -41,8 +43,8 @@ public class ApplicationRPG extends Application {
 
 	@Override
 	public void onTick() {
-		this.game.update();
 		super.onTick();
+		this.game.update();
 	}
 
 	@Override
@@ -63,5 +65,11 @@ public class ApplicationRPG extends Application {
 	public void onClose() {
 		super.onClose();
 		Game.getGame().dispose();
+		TileMap.Listener.clear();
+		app = null;
+	}
+	
+	public static ApplicationRPG getApp() {
+		return app;
 	}
 }

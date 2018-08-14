@@ -56,13 +56,14 @@ public class Basic3DTile extends Tile {
 			TileRenderer.render(renderX, renderY, state, 16);
 			GlStateManager.popMatrix();
 
-			if (layer > 1 && this.isFullCube(tileMap, x, y, layer) && !this.isTranslucent(tileMap, x, y, layer)) {
+			if (this.isFullCube(tileMap, x, y, layer) && !this.isTranslucent(tileMap, x, y, layer)) {
 				GlStateManager.enableBlend();
 				Color color = new Color(0f, 0f, 0f, 0.5f * ((float) (15 - this.getLighting(tileMap, x, y, layer)) / 15f));
-				RenderingHelper.fillRect(renderX, renderY, renderX + 16, renderY + 11, color.getRGB());
+				if (color.getAlpha() != 0) {
+					RenderingHelper.fillRect(renderX, renderY, renderX + 16, renderY + 11, color.getRGB());
+				}
 			}
 
-			// Minecraft.getMinecraft().entityRenderer.setupOverlayRendering();
 			this.diableLighting();
 		}
 	}
@@ -76,12 +77,11 @@ public class Basic3DTile extends Tile {
 		RenderHelper.disableStandardItemLighting();
 	}
 
-	@Nullable
 	protected int getLighting(TileMap tileMap, int x, int y, int layer) {
 		for (int i = layer; i < layer + 8; i++) {
 			Tile tile = tileMap.getTile(x, y, i);
 			if (tile != null && tile != Tile.AIR && tile.isFullCube(tileMap, x, y, i) && !tile.isTranslucent(tileMap, x, y, i)) {
-				return (int) ((MathHelper.clamp(i, 0, 8) / 8f) * 15f);
+				return i >= layer ? 15 : (int) (((float) MathHelper.clamp(i, layer, layer + 5) / ((float) layer + 5f)) * 15f);
 			}
 		}
 		return 15;

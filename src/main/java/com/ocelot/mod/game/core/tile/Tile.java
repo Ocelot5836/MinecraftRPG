@@ -11,6 +11,8 @@ import com.ocelot.mod.game.core.tile.tiles.TileAir;
 import com.ocelot.mod.game.core.tile.tiles.TileDirt;
 import com.ocelot.mod.game.core.tile.tiles.TileFalling;
 import com.ocelot.mod.game.core.tile.tiles.TileGrass;
+import com.ocelot.mod.game.core.tile.tiles.TileLeaves;
+import com.ocelot.mod.game.core.tile.tiles.TileLog;
 import com.ocelot.mod.game.core.tile.tiles.TilePlanks;
 import com.ocelot.mod.game.core.tile.tiles.TileSand;
 import com.ocelot.mod.game.core.tile.tiles.TileSapling;
@@ -54,6 +56,11 @@ public abstract class Tile {
 	// public static final Tile LAVA = new TileFluid(9, "lava", "lava", Blocks.LAVA.getDefaultState(), Blocks.FLOWING_LAVA.getDefaultState());
 	public static final Tile SAND = new TileSand(10);
 	public static final Tile GRAVEL = new TileFalling(11, "gravel", "gravel", Blocks.GRAVEL.getDefaultState());
+	public static final Tile GOLD_ORE = new Basic3DTile(12, "gold_ore", "gold_ore", Blocks.GOLD_ORE.getDefaultState());
+	public static final Tile IRON_ORE = new Basic3DTile(13, "iron_ore", "iron_ore", Blocks.IRON_ORE.getDefaultState());
+	public static final Tile COAL_ORE = new Basic3DTile(14, "coal_ore", "coal_ore", Blocks.COAL_ORE.getDefaultState());
+	public static final Tile LOG = new TileLog(15);
+	public static final Tile LEAVES = new TileLeaves(16);
 
 	// public static final Tile ANVIL = new Basic3DTile(3, "anvil", "anvil", Blocks.ANVIL.getDefaultState());
 	// public static final Tile ENCHANTMENT_TABLE = new TileEnchantmentTable(4);

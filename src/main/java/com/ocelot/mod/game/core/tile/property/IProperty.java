@@ -34,6 +34,16 @@ public interface IProperty<T> {
 	void setValue(T value);
 
 	/**
+	 * Sets the property value based on what the string contains.
+	 * 
+	 * @param value
+	 *            The new value in string form
+	 * @throws Exception
+	 *             Just in case something is wrong or the parameter is incorrect
+	 */
+	void parseValue(String value) throws Exception;
+
+	/**
 	 * @return The name of the property
 	 */
 	String getName();

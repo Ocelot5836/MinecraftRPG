@@ -16,12 +16,9 @@ public class PropertyString extends PropertyBase<String> {
 		return this.name;
 	}
 
-	public static PropertyString create(String name, String defaultValue) {
-		return new PropertyString(name, defaultValue);
-	}
-
-	public String getDefaultValue() {
-		return defaultValue;
+	@Override
+	public void parseValue(String value) {
+		this.setValue(value);
 	}
 
 	@Override
@@ -29,5 +26,9 @@ public class PropertyString extends PropertyBase<String> {
 		IProperty<String> property = new PropertyString(this.name, this.defaultValue);
 		property.setValue(this.getValue());
 		return property;
+	}
+
+	public static PropertyString create(String name, String defaultValue) {
+		return new PropertyString(name, defaultValue);
 	}
 }

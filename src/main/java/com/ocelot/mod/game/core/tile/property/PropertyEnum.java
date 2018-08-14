@@ -3,7 +3,6 @@ package com.ocelot.mod.game.core.tile.property;
 import java.util.Collection;
 import java.util.Map;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
@@ -42,13 +41,17 @@ public class PropertyEnum<T extends Enum<T> & IStringSerializable> extends Prope
 		return this.allowedValues;
 	}
 
-	public Optional<T> parseValue(String value) {
-		return Optional.<T>fromNullable(this.nameToValue.get(value));
-	}
-
 	@Override
 	public String getName() {
 		return name;
+	}
+
+	@Override
+	public void parseValue(String value) {
+		T obj = this.nameToValue.get(value);
+		if (obj != null) {
+			this.setValue(obj);
+		}
 	}
 
 	public boolean equals(Object p_equals_1_) {

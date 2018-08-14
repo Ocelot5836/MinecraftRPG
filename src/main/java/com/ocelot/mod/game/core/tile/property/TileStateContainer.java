@@ -1,6 +1,11 @@
 package com.ocelot.mod.game.core.tile.property;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import com.google.common.collect.Maps;
 import com.ocelot.mod.game.Game;
@@ -43,6 +48,20 @@ public class TileStateContainer {
 	 */
 	public Tile getTile() {
 		return tile;
+	}
+
+	/**
+	 * @return The properties in the container
+	 */
+	public Map<String, IProperty> getProperties() {
+		return properties;
+	}
+
+	/**
+	 * @return The number of properties in this container
+	 */
+	public int getNumberOfProperties() {
+		return properties.size();
 	}
 
 	/**

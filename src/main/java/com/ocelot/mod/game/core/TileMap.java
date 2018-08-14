@@ -2,11 +2,15 @@ package com.ocelot.mod.game.core;
 
 import java.io.BufferedReader;
 import java.io.StringReader;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.annotation.Nullable;
 
+import com.google.common.collect.Maps;
+import com.ocelot.mod.MinecraftRPG;
 import com.ocelot.mod.game.Game;
 import com.ocelot.mod.game.core.tile.Tile;
 import com.ocelot.mod.game.core.tile.property.IProperty;
@@ -16,6 +20,9 @@ import com.ocelot.mod.lib.Lib;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.resources.IReloadableResourceManager;
+import net.minecraft.client.resources.IResourceManager;
+import net.minecraft.client.resources.IResourceManagerReloadListener;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.ResourceLocation;
 
@@ -30,6 +37,8 @@ import net.minecraft.util.ResourceLocation;
  * @author Ocelot5836
  */
 public class TileMap {
+
+	private static final Map<String, CachedMap> CACHED_MAPS = Maps.<String, CachedMap>newHashMap();
 
 	private int[] tiles;
 	private TileStateContainer[] containers;
@@ -80,47 +89,134 @@ public class TileMap {
 	 *            The location of the map to load
 	 */
 	public TileMap(ResourceLocation mapLocation) {
-		String data = Lib.loadTextToString(mapLocation);
-		if (data == null)
-			throw new RuntimeException("Could not find map \'" + mapLocation + "\'");
+		this.tileEntities = new HashMap<String, TileEntity>();
 
-		String line = null;
-		try {
-			BufferedReader reader = new BufferedReader(new StringReader(data));
+		CachedMap map = CACHED_MAPS.get(mapLocation.toString());
 
-			int width = -1;
-			int height = -1;
-			int layers = -1;
-			int layer = -1;
+		if (map == null) {
+			String data = Lib.loadTextToString(mapLocation);
+			if (data == null)
+				throw new RuntimeException("Could not find map \'" + mapLocation + "\'");
 
-			while ((line = reader.readLine()) != null) {
-//				if (line.trim().isEmpty() || line.trim().startsWith("#"))
-//					continue;
-//				if (width == -1) {
-//					width = Integer.parseInt(line);
-//				} else if (height == -1) {
-//					height = Integer.parseInt(line);
-//				} else if (layers == -1) {
-//					layers = Integer.parseInt(line);
-//				} else {
-//					if (line.startsWith("layer:")) {
-//						if (width == -1 || height == -1 || layers == -1) {
-//							throw new IllegalArgumentException("Width, Height, and Layers can not be null!");
-//						}
-//						layer = Integer.parseInt(line.split(":")[1].trim());
-//					} else {
-//						if (layer == -1) {
-//							continue;
-//						}
-//						
-//						
-//					}
-//				}
+			String line = null;
+			try {
+				BufferedReader reader = new BufferedReader(new StringReader(data));
+
+				this.width = -1;
+				this.height = -1;
+				this.layers = -1;
+
+				int layer = -1;
+				int loadedHeight = 0;
+				while ((line = reader.readLine()) != null) {
+					if (line.trim().isEmpty() || line.trim().startsWith("#"))
+						continue;
+					if (this.width == -1) {
+						this.width = Integer.parseInt(line);
+						continue;
+					} else if (this.height == -1) {
+						this.height = Integer.parseInt(line);
+						continue;
+					} else if (this.layers == -1) {
+						this.layers = Integer.parseInt(line);
+						this.tiles = new int[this.width * this.height * this.layers];
+						this.containers = new TileStateContainer[this.tiles.length];
+						continue;
+					} else {
+						if (line.contains("layer:")) {
+							if (width == -1 || height == -1 || layers == -1) {
+								throw new IllegalArgumentException("Width, Height, and Layers can not be null!");
+							}
+							layer = Integer.parseInt(line.split(":")[1].trim());
+							loadedHeight = 0;
+							if (layer >= this.layers) {
+								MinecraftRPG.logger().warn("Layer " + layer + " is out of the bounds " + this.layers);
+								layer = -1;
+								continue;
+							}
+						} else {
+							if (layer == -1) {
+								continue;
+							}
+
+							if (loadedHeight >= height) {
+								layer = -1;
+								continue;
+							}
+
+							String[] splitTiles = line.split(" ");
+							for (int i = 0; i < splitTiles.length; i++) {
+								int id = Tile.AIR.getId();
+								String[] setProperties = new String[0];
+								try {
+									String[] splitProperties = splitTiles[i].split("\\[");
+									id = Integer.parseInt(splitProperties[0]);
+									if (splitProperties.length > 1) {
+										setProperties = this.getTileProperties(splitProperties[1]);
+									}
+								} catch (Throwable t) {
+									t.printStackTrace();
+								}
+								this.setTile(Tile.getTile(id), i, loadedHeight, layer);
+
+								TileStateContainer container = this.getContainer(i, loadedHeight, layer);
+								Map<String, IProperty> properties = container.getProperties();
+
+								for (String name : properties.keySet()) {
+									IProperty property = properties.get(name);
+									for (int j = 0; j < setProperties.length; j++) {
+										String[] values = setProperties[j].split("\\=");
+										System.out.println(Arrays.toString(values));
+										if (values.length > 1) {
+											property.parseValue(values[1]);
+										}
+									}
+								}
+							}
+
+							loadedHeight++;
+						}
+					}
+				}
+				reader.close();
+			} catch (Exception e) {
+				Game.getGame().handleCrash(e, "Error loading map \'" + mapLocation + "\' for line \'" + line + "\'");
 			}
-			reader.close();
-		} catch (Exception e) {
-			Game.getGame().handleCrash(e, "Error loading map \'" + mapLocation + "\' for line \'" + line + "\'");
+			map = new CachedMap(mapLocation, this.tiles, this.containers, this.tileEntities);
+			CACHED_MAPS.put(mapLocation.toString(), map);
 		}
+		int[] mapTiles = map.getTiles();
+		TileStateContainer[] mapContainers = map.getContainers();
+
+		this.tiles = new int[mapTiles.length];
+		this.containers = new TileStateContainer[mapContainers.length];
+
+		for (int i = 0; i < mapTiles.length; i++) {
+			this.tiles[i] = mapTiles[i];
+			this.containers[i] = mapContainers[i];
+		}
+
+		this.tileEntities = new HashMap<String, TileEntity>(map.getTileEntities());
+	}
+
+	private void checkProperties(Entry<String, IProperty> entry, String[] setProperties) {
+
+	}
+
+	/**
+	 * Fetches the properties from a tile.
+	 * 
+	 * @param tile
+	 *            The tile to get the properties from
+	 * @return The properties extracted from tiles
+	 */
+	private String[] getTileProperties(String tile) {
+		String[] properties = tile.split("\\]")[0].split(",");
+		return properties;
+	}
+
+	public void addTreeTemp(int x, int y, int layer, int height) {
+
 	}
 
 	/**
@@ -374,6 +470,80 @@ public class TileMap {
 		TileStateContainer container = this.getContainer(x, y, layer);
 		if (container != TileStateContainer.NULL) {
 			container.setValue(property, value == null ? property.getDefaultValue() : value);
+		}
+	}
+
+	/**
+	 * <em><b>Copyright (c) 2018 Ocelot5836.</b></em>
+	 * 
+	 * <br>
+	 * </br>
+	 * 
+	 * Used to store loading data so a map only needs to be loaded once.
+	 * 
+	 * @author Ocelot5836
+	 */
+	private static class CachedMap {
+
+		private ResourceLocation location;
+		private int[] tiles;
+		private TileStateContainer[] containers;
+		private Map<String, TileEntity> tileEntities;
+
+		private CachedMap(ResourceLocation location, int[] tiles, TileStateContainer[] containers, Map<String, TileEntity> tileEntities) {
+			this.location = location;
+			this.tiles = new int[tiles.length];
+			this.containers = new TileStateContainer[tiles.length];
+			this.tileEntities = new HashMap<String, TileEntity>(tileEntities);
+			for (int i = 0; i < tiles.length; i++) {
+				this.tiles[i] = tiles[i];
+				this.containers[i] = containers[i];
+			}
+		}
+
+		public ResourceLocation getLocation() {
+			return location;
+		}
+
+		public int[] getTiles() {
+			return tiles;
+		}
+
+		public TileStateContainer[] getContainers() {
+			return containers;
+		}
+
+		public Map<String, TileEntity> getTileEntities() {
+			return tileEntities;
+		}
+	}
+
+	/**
+	 * <em><b>Copyright (c) 2018 Ocelot5836.</b></em>
+	 * 
+	 * <br>
+	 * </br>
+	 * 
+	 * Used to handle the tile map reloading event.
+	 * 
+	 * @author Ocelot5836
+	 */
+	public static class Listener implements IResourceManagerReloadListener {
+
+		private static final Listener INSTANCE = new Listener();
+
+		public static void register() {
+			((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(INSTANCE);
+		}
+
+		public static void clear() {
+			CACHED_MAPS.clear();
+		}
+
+		@Override
+		public void onResourceManagerReload(IResourceManager resourceManager) {
+			MinecraftRPG.logger().info("Reloading TileMaps");
+			clear();
 		}
 	}
 }

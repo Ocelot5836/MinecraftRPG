@@ -11,11 +11,20 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.ItemStack;
 
+/**
+ * <em><b>Copyright (c) 2018 Ocelot5836.</b></em>
+ * 
+ * <br>
+ * </br>
+ * 
+ * Allows the ability to render tiles to the screen.
+ * 
+ * @author Ocelot5836
+ */
 public class TileRenderer {
 
 	private static final Map<Block, ItemStack> STACKS = Maps.newHashMap();
@@ -23,6 +32,20 @@ public class TileRenderer {
 	private TileRenderer() {
 	}
 
+	/**
+	 * Renders a flat colored quad to the screen.
+	 * 
+	 * @param x
+	 *            The x position to render at
+	 * @param y
+	 *            The y position to render at
+	 * @param width
+	 *            The width of the quad
+	 * @param height
+	 *            The height of the quad
+	 * @param color
+	 *            The hex/int color of the quad
+	 */
 	public static void render(double x, double y, double width, double height, int color) {
 		float f3 = (float) (color >> 24 & 255) / 255.0F;
 		float f = (float) (color >> 16 & 255) / 255.0F;
@@ -44,6 +67,20 @@ public class TileRenderer {
 		GlStateManager.disableBlend();
 	}
 
+	/**
+	 * Renders a flat textured quad to the screen.
+	 * 
+	 * @param x
+	 *            The x position to render at
+	 * @param y
+	 *            The y position to render at
+	 * @param width
+	 *            The width of the quad
+	 * @param height
+	 *            The height of the quad
+	 * @param sprite
+	 *            The texture to use when rendering the quad
+	 */
 	public static void render(double x, double y, double width, double height, TextureAtlasSprite sprite) {
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferbuilder = tessellator.getBuffer();
@@ -55,19 +92,34 @@ public class TileRenderer {
 		tessellator.draw();
 	}
 
+	/**
+	 * Renders a block state to the screen.
+	 * 
+	 * @param x
+	 *            The x position to render the state at
+	 * @param y
+	 *            The y position to render the state at
+	 * @param state
+	 *            The state to render
+	 * @param scale
+	 *            The scale of the state
+	 */
 	public static void render(double x, double y, IBlockState state, double scale) {
 		ItemStack stack = STACKS.get(state.getBlock());
-		if(stack == null) {
+		if (stack == null) {
 			stack = new ItemStack(state.getBlock());
 			STACKS.put(state.getBlock(), stack);
 		}
-		
+
 		GlStateManager.pushMatrix();
 		GlStateManager.scale(scale, scale, scale);
 		RenderUtil.renderModel(Minecraft.getMinecraft().getBlockRendererDispatcher().getModelForState(state), stack);
 		GlStateManager.popMatrix();
 	}
 
+	/**
+	 * Clears any memory that was used while rendering.
+	 */
 	public static void dispose() {
 		STACKS.clear();
 	}

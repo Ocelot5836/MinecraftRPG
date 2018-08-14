@@ -1,5 +1,6 @@
 package com.ocelot.mod.game.core.tile.property;
 
+import com.google.common.base.Optional;
 import com.ocelot.mod.game.Game;
 
 public class PropertyInteger extends PropertyBase<Integer> {
@@ -27,8 +28,9 @@ public class PropertyInteger extends PropertyBase<Integer> {
 		return this.name;
 	}
 
-	public static PropertyInteger create(String name, int minValue, int maxValue) {
-		return new PropertyInteger(name, minValue, maxValue);
+	@Override
+	public void parseValue(String value) {
+		this.setValue(Integer.parseInt(value));
 	}
 
 	public int getMinValue() {
@@ -44,5 +46,9 @@ public class PropertyInteger extends PropertyBase<Integer> {
 		IProperty<Integer> property = new PropertyInteger(this.name, this.minValue, this.maxValue);
 		property.setValue(this.getValue());
 		return property;
+	}
+	
+	public static PropertyInteger create(String name, int minValue, int maxValue) {
+		return new PropertyInteger(name, minValue, maxValue);
 	}
 }

@@ -2,10 +2,11 @@ package com.ocelot.mod;
 
 import org.apache.logging.log4j.Logger;
 
-import com.mrcrayfish.device.Reference;
 import com.mrcrayfish.device.api.ApplicationManager;
 import com.mrcrayfish.device.programs.ApplicationBoatRacers;
+import com.ocelot.mod.app.ApplicationLevelCreator;
 import com.ocelot.mod.app.ApplicationRPG;
+import com.ocelot.mod.game.core.TileMap;
 
 import net.minecraft.launchwrapper.Launch;
 import net.minecraft.util.ResourceLocation;
@@ -35,6 +36,8 @@ public class MinecraftRPG {
 	public static final String VERSION = "0.0.1";
 	/** The id for the rpg app */
 	public static final ResourceLocation GAME_ID = new ResourceLocation(MOD_ID, "rpg");
+	/** The id for the rpg level creator app */
+	public static final ResourceLocation LEVEL_CREATOR_ID = new ResourceLocation(MOD_ID, "level_creator");
 
 	/** The mod's instance. Probably not too useful but might as well have it */
 	@Instance(MOD_ID)
@@ -46,12 +49,18 @@ public class MinecraftRPG {
 	@EventHandler
 	public void pre(FMLPreInitializationEvent event) {
 		logger = event.getModLog();
+		
+		TileMap.Listener.register();
 	}
 
 	@EventHandler
 	public void init(FMLInitializationEvent event) {
 		ApplicationManager.registerApplication(GAME_ID, ApplicationRPG.class);
-		ApplicationManager.registerApplication(new ResourceLocation(MOD_ID, "boat_racers"), ApplicationBoatRacers.class);
+
+		if (MinecraftRPG.isDebug()) {
+			ApplicationManager.registerApplication(LEVEL_CREATOR_ID, ApplicationLevelCreator.class);
+			ApplicationManager.registerApplication(new ResourceLocation(MOD_ID, "boat_racers"), ApplicationBoatRacers.class);
+		}
 	}
 
 	@EventHandler
