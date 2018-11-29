@@ -25,11 +25,6 @@ import net.minecraft.init.Blocks;
 import net.minecraft.util.ITickable;
 
 /**
- * <em><b>Copyright (c) 2018 Ocelot5836.</b></em>
- * 
- * <br>
- * </br>
- * 
  * A single cube in the game world.
  * 
  * @author Ocelot5836

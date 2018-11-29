@@ -17,12 +17,7 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.util.math.MathHelper;
 
 /**
- * <em><b>Copyright (c) 2018 Ocelot5836.</b></em>
- * 
- * <br>
- * </br>
- * 
- * A basic implementation of {@link Tile}.
+ * A basic implementation of {@link Tile} that uses an {@link IBlockState} to render.
  * 
  * @author Ocelot5836
  */
@@ -46,9 +41,7 @@ public class Basic3DTile extends Tile {
 
 			int light = 0;
 
-			GlStateManager.pushMatrix();
 			this.applyLighting();
-			GlStateManager.popMatrix();
 
 			GlStateManager.rotate(45, 1, 0, 0);
 			GlStateManager.rotate(180, 1, 0, 0);
@@ -68,11 +61,19 @@ public class Basic3DTile extends Tile {
 		}
 	}
 
+	/**
+	 * Applies the standard quad lighting.
+	 */
 	protected void applyLighting() {
+		GlStateManager.pushMatrix();
 		GlStateManager.rotate(45, 1, 0, 0);
 		RenderHelper.enableGUIStandardItemLighting();
+		GlStateManager.popMatrix();
 	}
 
+	/**
+	 * Disables all lighting.
+	 */
 	protected void diableLighting() {
 		RenderHelper.disableStandardItemLighting();
 	}
@@ -86,7 +87,32 @@ public class Basic3DTile extends Tile {
 		}
 		return 15;
 	}
+	
+	@Override
+	public boolean isFullCube(TileMap tileMap, int x, int y, int layer) {
+		IBlockState state = this.getState(tileMap, x, y, layer);
+		return state == null ? false : state.isFullCube();
+	}
+	
+	@Override
+	public boolean isTranslucent(TileMap tileMap, int x, int y, int layer) {
+		IBlockState state = this.getState(tileMap, x, y, layer);
+		return state == null ? false : state.isTranslucent();
+	}
 
+	/**
+	 * Used to determine what state will be rendered. Return <code>null</code> to cancel all rendering.
+	 * 
+	 * @param tileMap
+	 *            The map this is being rendered into
+	 * @param x
+	 *            The x position of the tile
+	 * @param y
+	 *            The y position of the tile
+	 * @param layer
+	 *            The layer of the tile
+	 * @return The state that will be used to render or null.
+	 */
 	@Nullable
 	public IBlockState getState(TileMap tileMap, int x, int y, int layer) {
 		return state;
