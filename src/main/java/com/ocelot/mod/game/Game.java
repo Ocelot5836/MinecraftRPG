@@ -4,8 +4,6 @@ import javax.annotation.Nullable;
 
 import org.lwjgl.input.Keyboard;
 
-import com.mrcrayfish.device.Reference;
-import com.mrcrayfish.device.api.ApplicationManager;
 import com.mrcrayfish.device.core.Laptop;
 import com.ocelot.mod.MinecraftRPG;
 import com.ocelot.mod.app.ApplicationRPG;
@@ -14,15 +12,9 @@ import com.ocelot.mod.game.core.gfx.TileRenderer;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 
 /**
- * <em><b>Copyright (c) 2018 Ocelot5836.</b></em>
- * 
- * <br>
- * </br>
- * 
  * The main class that begins the required processes and loads the required assets.
  * 
  * @author Ocelot5836
@@ -55,8 +47,9 @@ public class Game {
 	 * 
 	 * @param app
 	 *            The application that ran the game
+	 * @return This game's instance
 	 */
-	public void launch(ApplicationRPG app) {
+	public Game launch(ApplicationRPG app) {
 		this.app = app;
 
 		try {
@@ -65,6 +58,8 @@ public class Game {
 			this.handleCrash(t, "Error while initialization");
 		}
 		MinecraftRPG.logger().info("Starting...");
+
+		return this;
 	}
 
 	/**

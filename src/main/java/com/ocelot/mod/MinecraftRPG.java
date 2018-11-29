@@ -18,11 +18,6 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
 /**
- * <em><b>Copyright (c) 2018 Ocelot5836.</b></em>
- * 
- * <br>
- * </br>
- * 
  * The main mod class.
  * 
  * @author Ocelot5836

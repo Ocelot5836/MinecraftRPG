@@ -3,7 +3,7 @@ package com.ocelot.mod.game.core.gfx;
 import java.util.Map;
 
 import com.google.common.collect.Maps;
-import com.mrcrayfish.guns.client.util.RenderUtil;
+import com.ocelot.mod.lib.RenderUtil;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;

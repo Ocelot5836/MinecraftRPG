@@ -26,8 +26,7 @@ public class ApplicationRPG extends Application {
 
 	@Override
 	public void init(@Nullable NBTTagCompound intent) {
-		new Game().launch(this);
-		this.game = Game.getGame();
+		this.game = new Game().launch(this);
 
 		this.setDefaultWidth(362);
 		this.setDefaultHeight(164);
