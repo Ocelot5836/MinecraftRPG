@@ -149,6 +149,13 @@ public class Game {
 		MinecraftRPG.logger().catching(t);
 		Laptop.getSystem().closeApplication(this.app.getInfo());
 	}
+	
+	/**
+	 * @return The application instance
+	 */
+	public ApplicationRPG getApp() {
+		return app;
+	}
 
 	/**
 	 * @return The running game instance or null if the game is not running

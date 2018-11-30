@@ -2,7 +2,6 @@ package com.ocelot.mod.game.core;
 
 import java.io.BufferedReader;
 import java.io.StringReader;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -166,7 +165,6 @@ public class TileMap {
 									IProperty property = properties.get(name);
 									for (int j = 0; j < setProperties.length; j++) {
 										String[] values = setProperties[j].split("\\=");
-										System.out.println(Arrays.toString(values));
 										if (values.length > 1) {
 											property.parseValue(values[1]);
 										}
@@ -220,7 +218,7 @@ public class TileMap {
 	}
 
 	/**
-	 * Called 20 times per second. Updates the things inside a tile map.
+	 * Called 20 times per second. Updates the objects inside of a tile map.
 	 */
 	public void update() {
 		Tile.updateTiles();
@@ -248,7 +246,7 @@ public class TileMap {
 	}
 
 	/**
-	 * Called to render this tile to the screen.
+	 * Called to render all the objects to the screen.
 	 * 
 	 * @param gui
 	 *            The gui that is rendering this game
@@ -260,16 +258,19 @@ public class TileMap {
 	 *            The percentage from last update and this update
 	 */
 	public void render(Gui gui, Minecraft mc, Game game, float partialTicks) {
+		double renderOffsetX = this.lastXOffset + (this.xOffset - this.lastXOffset) * partialTicks;
+		double renderOffsetY = this.lastYOffset + (this.yOffset - this.lastYOffset) * partialTicks;
+
 		for (int layer = 0; layer < this.layers; layer++) {
-			for (int y = 0; y < this.height; y++) {
-				for (int x = 0; x < this.width; x++) {
+			for (int y = (int) (renderOffsetY / 16.0) - 1; y < (int) (renderOffsetY / 16.0 + game.getApp().getHeight() / 8.0) + 1 + layer; y++) {
+				for (int x = (int) (renderOffsetX / 16.0) - 1; x < (int) (renderOffsetX / 16.0 + game.getApp().getWidth() / 16.0) + 1; x++) {
 					Tile tile = this.getTile(x, y, layer);
 					if (tile != null) {
 						TileStateContainer container = this.getContainer(x, y, layer);
 						if (container != null) {
 							tile.modifyContainer(x, y, layer, this, container);
 						}
-						tile.render(gui, mc, game, this, x, y, layer, x * 16 - (this.lastXOffset + (this.xOffset - this.lastXOffset) * partialTicks), y * 16 - (this.lastYOffset + (this.yOffset - this.lastYOffset) * partialTicks) - 4.75 * y, partialTicks);
+						tile.render(gui, mc, game, this, x, y, layer, x * 16 - renderOffsetX, y * 16 - renderOffsetY - 4.75 * y, partialTicks);
 					}
 				}
 			}

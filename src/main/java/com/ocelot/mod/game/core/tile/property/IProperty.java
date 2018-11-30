@@ -1,11 +1,6 @@
 package com.ocelot.mod.game.core.tile.property;
 
 /**
- * <em><b>Copyright (c) 2018 Ocelot5836.</b></em>
- * 
- * <br>
- * </br>
- * 
  * Allows the ability for blocks to store basic values inside of the tile positioning data.
  * 
  * @author Ocelot5836
@@ -21,7 +16,7 @@ public interface IProperty<T> {
 	T getValue();
 
 	/**
-	 * @return The default property's value
+	 * @return The property's default value
 	 */
 	T getDefaultValue();
 

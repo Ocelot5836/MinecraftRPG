@@ -17,7 +17,7 @@ import net.minecraft.nbt.NBTTagCompound;
 public class ApplicationRPG extends Application {
 
 	private static ApplicationRPG app;
-	
+
 	private Game game;
 
 	public ApplicationRPG() {
@@ -54,6 +54,7 @@ public class ApplicationRPG extends Application {
 			GLHelper.pushScissor(x, y, this.getWidth(), this.getHeight());
 			GlStateManager.translate(x, y, 50);
 			this.game.render(laptop, mc, mouseX - x, mouseY - y, partialTicks);
+			mc.fontRenderer.drawString(Minecraft.getDebugFPS() + " FPS", 2, 2, 0xffffffff, true);
 			GLHelper.popScissor();
 		}
 		GlStateManager.popMatrix();
@@ -67,7 +68,7 @@ public class ApplicationRPG extends Application {
 		TileMap.Listener.clear();
 		app = null;
 	}
-	
+
 	public static ApplicationRPG getApp() {
 		return app;
 	}
