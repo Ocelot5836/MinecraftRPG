@@ -7,7 +7,7 @@ import org.lwjgl.input.Keyboard;
 import com.mrcrayfish.device.core.Laptop;
 import com.ocelot.mod.MinecraftRPG;
 import com.ocelot.mod.app.ApplicationRPG;
-import com.ocelot.mod.game.core.TileMap;
+import com.ocelot.mod.game.core.Level;
 import com.ocelot.mod.game.core.gfx.TileRenderer;
 
 import net.minecraft.client.Minecraft;
@@ -22,24 +22,16 @@ import net.minecraft.util.ResourceLocation;
 public class Game {
 
 	private static Game instance;
-
 	private ApplicationRPG app;
 
 	/** temporary code */
-	private TileMap tileMap;
-
-	public Game() {
-		instance = this;
-	}
+	private Level level;
 
 	/**
 	 * Initializes the game.
-	 * 
-	 * @throws Throwable
-	 *             just in case something goes wrong so the game can handle it
 	 */
 	private void init() throws Throwable {
-		this.tileMap = new TileMap(new ResourceLocation(MinecraftRPG.MOD_ID, "maps/test.map"));
+		this.level = new Level(new ResourceLocation(MinecraftRPG.MOD_ID, "test"));
 	}
 
 	/**
@@ -50,6 +42,7 @@ public class Game {
 	 * @return This game's instance
 	 */
 	public Game launch(ApplicationRPG app) {
+		instance = this;
 		this.app = app;
 
 		try {
@@ -63,31 +56,31 @@ public class Game {
 	}
 
 	/**
-	 * Called 20 times per second from the gui that is hosting this game
+	 * Called 20 times per second from the gui that is hosting this game.
 	 */
 	public void update() {
 		try {
-			this.tileMap.update();
+			this.level.update();
 
 			if (Keyboard.isKeyDown(Keyboard.KEY_W)) {
-				this.tileMap.setOffset(this.tileMap.getXOffset(), this.tileMap.getYOffset() - 5);
+				this.level.addOffset(0, -5);
 			}
 
 			if (Keyboard.isKeyDown(Keyboard.KEY_S)) {
-				this.tileMap.setOffset(this.tileMap.getXOffset(), this.tileMap.getYOffset() + 5);
+				this.level.addOffset(0, 5);
 			}
 
 			if (Keyboard.isKeyDown(Keyboard.KEY_A)) {
-				this.tileMap.setOffset(this.tileMap.getXOffset() - 5, this.tileMap.getYOffset());
+				this.level.addOffset(-5, 0);
 			}
 
 			if (Keyboard.isKeyDown(Keyboard.KEY_D)) {
-				this.tileMap.setOffset(this.tileMap.getXOffset() + 5, this.tileMap.getYOffset());
+				this.level.addOffset(5, 0);
 			}
 		} catch (GameCrashException e) {
 			handleCrash(e.getCause(), e.getMessage());
 		} catch (Exception e) {
-			handleCrash(e, "The game crashed for an unknown reason");
+			handleCrash(e);
 		}
 	}
 
@@ -107,11 +100,11 @@ public class Game {
 	 */
 	public void render(Gui gui, Minecraft mc, float mouseX, float mouseY, float partialTicks) {
 		try {
-			this.tileMap.render(gui, mc, this, partialTicks);
+			this.level.render(gui, mc, this, partialTicks);
 		} catch (GameCrashException e) {
 			handleCrash(e.getCause(), e.getMessage());
 		} catch (Exception e) {
-			handleCrash(e, "The game crashed for an unknown reason");
+			handleCrash(e);
 		}
 	}
 
@@ -122,7 +115,6 @@ public class Game {
 		MinecraftRPG.logger().info("Stopping...");
 		TileRenderer.dispose();
 		instance = null;
-
 		this.app = null;
 	}
 
@@ -142,14 +134,13 @@ public class Game {
 	 * @param t
 	 *            The error that was thrown
 	 * @param info
-	 *            The reason/information as to why the game crashed
+	 *            The reason why the game crashed
 	 */
 	public void handleCrash(Throwable t, String info) {
-		MinecraftRPG.logger().error(info);
-		MinecraftRPG.logger().catching(t);
+		MinecraftRPG.logger().error(info, t);
 		Laptop.getSystem().closeApplication(this.app.getInfo());
 	}
-	
+
 	/**
 	 * @return The application instance
 	 */
