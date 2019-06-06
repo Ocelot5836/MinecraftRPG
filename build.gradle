@@ -34,11 +34,14 @@ minecraft {
 }
 
 repositories {
-    maven { url = "https://mrcrayfish.com/maven" }
+    maven {
+        name = "CurseForge"
+        url = "https://minecraft.curseforge.com/api/maven/"
+    }
 }
 
 dependencies {
-    compile "com.mrcrayfish:device-api:0.4.0-1.12.2"
+	deobfCompile "mrcrayfishs-device-mod:device-mod:0.4.1:1.12.2"
 }
 
 processResources {
