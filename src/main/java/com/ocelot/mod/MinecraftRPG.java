@@ -4,7 +4,6 @@ import org.apache.logging.log4j.Logger;
 
 import com.mrcrayfish.device.api.ApplicationManager;
 import com.mrcrayfish.device.programs.ApplicationBoatRacers;
-import com.ocelot.mod.app.ApplicationLevelCreator;
 import com.ocelot.mod.app.ApplicationRPG;
 import com.ocelot.mod.game.core.TileMap;
 
@@ -23,7 +22,8 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
  * @author Ocelot5836
  */
 @Mod(modid = MinecraftRPG.MOD_ID, version = MinecraftRPG.VERSION, acceptedMinecraftVersions = "[1.12,1.12.2]", useMetadata = true)
-public class MinecraftRPG {
+public class MinecraftRPG
+{
 
 	/** The mod id */
 	public static final String MOD_ID = "mrpg";
@@ -31,8 +31,6 @@ public class MinecraftRPG {
 	public static final String VERSION = "0.0.1";
 	/** The id for the rpg app */
 	public static final ResourceLocation GAME_ID = new ResourceLocation(MOD_ID, "rpg");
-	/** The id for the rpg level creator app */
-	public static final ResourceLocation LEVEL_CREATOR_ID = new ResourceLocation(MOD_ID, "level_creator");
 
 	/** The mod's instance. Probably not too useful but might as well have it */
 	@Instance(MOD_ID)
@@ -42,37 +40,42 @@ public class MinecraftRPG {
 	private static Logger logger;
 
 	@EventHandler
-	public void pre(FMLPreInitializationEvent event) {
+	public void pre(FMLPreInitializationEvent event)
+	{
 		logger = event.getModLog();
-		
+
 		TileMap.Listener.register();
 	}
 
 	@EventHandler
-	public void init(FMLInitializationEvent event) {
+	public void init(FMLInitializationEvent event)
+	{
 		ApplicationManager.registerApplication(GAME_ID, ApplicationRPG.class);
 
-		if (MinecraftRPG.isDebug()) {
-			ApplicationManager.registerApplication(LEVEL_CREATOR_ID, ApplicationLevelCreator.class);
+		if (MinecraftRPG.isDebug())
+		{
 			ApplicationManager.registerApplication(new ResourceLocation(MOD_ID, "boat_racers"), ApplicationBoatRacers.class);
 		}
 	}
 
 	@EventHandler
-	public void post(FMLPostInitializationEvent event) {
+	public void post(FMLPostInitializationEvent event)
+	{
 	}
 
 	/**
 	 * @return A logger that uses the mod id as the name
 	 */
-	public static Logger logger() {
+	public static Logger logger()
+	{
 		return logger;
 	}
 
 	/**
 	 * @return Whether or not the mod is in a deobfuscated environment
 	 */
-	public static boolean isDebug() {
+	public static boolean isDebug()
+	{
 		return (Boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment");
 	}
 }

@@ -1,10 +1,9 @@
 package com.ocelot.mod.game.core.tile;
 
-import java.awt.Color;
-
 import javax.annotation.Nullable;
 
-import com.ocelot.api.libs.RenderingHelper;
+import org.lwjgl.util.glu.Project;
+
 import com.ocelot.mod.game.Game;
 import com.ocelot.mod.game.core.TileMap;
 import com.ocelot.mod.game.core.gfx.TileRenderer;
@@ -46,18 +45,26 @@ public class Basic3DTile extends Tile {
 			GlStateManager.rotate(45, 1, 0, 0);
 			GlStateManager.rotate(180, 1, 0, 0);
 
+			GlStateManager.matrixMode(5889);
+			GlStateManager.pushMatrix();
+			GlStateManager.loadIdentity();
+	        Project.gluPerspective(90.0F, 1.3333334F, 9.0F, 80.0F);
+			GlStateManager.matrixMode(5888);
+			GlStateManager.pushMatrix();
+			GlStateManager.loadIdentity();
+			
+//			if (this.isFullCube(tileMap, x, y, layer) && !this.isTranslucent(tileMap, x, y, layer))
+//				GlStateManager.color(0.5f * ((float) (15 - this.getLighting(tileMap, x, y, layer)) / 15f) / 255f, 0.5f * ((float) (15 - this.getLighting(tileMap, x, y, layer)) / 15f) / 255f, 0.5f * ((float) (15 - this.getLighting(tileMap, x, y, layer)) / 15f) / 255f);
 			TileRenderer.render(renderX, renderY, state, 16);
-			GlStateManager.popMatrix();
 
-			if (this.isFullCube(tileMap, x, y, layer) && !this.isTranslucent(tileMap, x, y, layer)) {
-				GlStateManager.enableBlend();
-				Color color = new Color(0f, 0f, 0f, 0.5f * ((float) (15 - this.getLighting(tileMap, x, y, layer)) / 15f));
-				if (color.getAlpha() != 0) {
-					RenderingHelper.fillRect(renderX, renderY, renderX + 16, renderY + 11, color.getRGB());
-				}
-			}
+	        GlStateManager.matrixMode(5889);
+	        GlStateManager.popMatrix();
+	        GlStateManager.matrixMode(5888);
+	        GlStateManager.popMatrix();
 
 			this.diableLighting();
+			
+			GlStateManager.popMatrix();
 		}
 	}
 
@@ -79,9 +86,11 @@ public class Basic3DTile extends Tile {
 	}
 
 	protected int getLighting(TileMap tileMap, int x, int y, int layer) {
-		for (int i = layer; i < layer + 8; i++) {
+		for (int i = layer; i < layer + 8; i++)
+		{
 			Tile tile = tileMap.getTile(x, y, i);
-			if (tile != null && tile != Tile.AIR && tile.isFullCube(tileMap, x, y, i) && !tile.isTranslucent(tileMap, x, y, i)) {
+			if (tile != null && tile != Tile.AIR && tile.isFullCube(tileMap, x, y, i) && !tile.isTranslucent(tileMap, x, y, i))
+			{
 				return i >= layer ? 15 : (int) (((float) MathHelper.clamp(i, layer, layer + 5) / ((float) layer + 5f)) * 15f);
 			}
 		}
